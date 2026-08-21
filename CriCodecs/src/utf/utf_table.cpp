@@ -171,10 +171,11 @@ Value UtfTable::read_value_at(const uint8_t* buf, ColumnType type) const {
             return std::string(string_at(str_offset));
         }
         case ColumnType::VLData: {
-            DataRef ref;
-            ref.offset = read_be<uint32_t>(buf + 0);
-            ref.size = read_be<uint32_t>(buf + 4);
-            return ref;
+            uint32_t offset = read_be<uint32_t>(buf + 0);
+            uint32_t size = read_be<uint32_t>(buf + 4);
+            std::vector<uint8_t> blob;
+            blob.assign(m_data.begin() + offset, m_data.begin() + offset + size);
+            return blob;
         }
         case ColumnType::GUID: {
             GUID guid;
@@ -274,21 +275,23 @@ std::expected<std::span<const uint8_t>, std::string> UtfTable::get_data(uint32_t
         const auto& bytes = std::get<std::vector<uint8_t>>(m_values[row][col]);
         return std::span<const uint8_t>(bytes.data(), bytes.size());
     }
+    return std::unexpected("UTF column is not VLData type");
 
-    auto val = get_value(row, col);
-    if (!val) return std::unexpected(val.error());
+    // auto val = get_value(row, col);
+    // if (!val) return std::unexpected(val.error());
 
-    if (!std::holds_alternative<DataRef>(*val)) {
-        return std::unexpected("UTF column is not VLData type");
-    }
+    // if (!std::holds_alternative<std::vector<uint8_t>>(*val)) {
+    //     return std::unexpected("UTF column is not VLData type");
+    // }
 
-    DataRef ref = std::get<DataRef>(*val);
-    uint32_t abs_offset = m_data_offset + ref.offset;
-    if (abs_offset + ref.size > m_source.size()) {
-        return std::unexpected("UTF data reference is out of bounds");
-    }
+    // DataRef ref = std::get<DataRef>(*val);
+    // return std::span<const uint8_t>(std::get<std::vector<uint8_t>>(*val));
+    // uint32_t abs_offset = m_data_offset + ref.offset;
+    // if (abs_offset + ref.size > m_source.size()) {
+    //     return std::unexpected("UTF data reference is out of bounds");
+    // }
 
-    return std::span<const uint8_t>(m_source.data() + abs_offset, ref.size);
+    // return std::span<const uint8_t>(m_source.data() + abs_offset, ref.size);
 }
 
 std::expected<std::span<const uint8_t>, std::string> UtfTable::get_default_data(uint32_t col) const {
@@ -299,18 +302,20 @@ std::expected<std::span<const uint8_t>, std::string> UtfTable::get_default_data(
         const auto& bytes = std::get<std::vector<uint8_t>>(*val);
         return std::span<const uint8_t>(bytes.data(), bytes.size());
     }
+    return std::unexpected("UTF column is not VLData type");
 
-    if (!std::holds_alternative<DataRef>(*val)) {
-        return std::unexpected("UTF column is not VLData type");
-    }
+    // if (!std::holds_alternative<DataRef>(*val)) {
+    //     return std::unexpected("UTF column is not VLData type");
+    // }
 
-    DataRef ref = std::get<DataRef>(*val);
-    uint32_t abs_offset = m_data_offset + ref.offset;
-    if (abs_offset + ref.size > m_source.size()) {
-        return std::unexpected("UTF data reference is out of bounds");
-    }
+    // DataRef ref = std::get<DataRef>(*val);
+    // return std::span<const uint8_t>(ref.blob);
+    // uint32_t abs_offset = m_data_offset + ref.offset;
+    // if (abs_offset + ref.size > m_source.size()) {
+    //     return std::unexpected("UTF data reference is out of bounds");
+    // }
 
-    return std::span<const uint8_t>(m_source.data() + abs_offset, ref.size);
+    // return std::span<const uint8_t>(m_source.data() + abs_offset, ref.size);
 }
 
 std::expected<std::string_view, std::string> UtfTable::get_string(uint32_t row, uint32_t col) const {

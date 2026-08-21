@@ -12,8 +12,10 @@
 
 #include "../utilities/io_endian.hpp"
 
+#include <cassert>
 #include <memory>
 #include <utility>
+#include <variant>
 
 namespace cricodecs::utf {
 
@@ -41,6 +43,9 @@ std::expected<UtfTable, std::string> UtfTable::load(std::span<const uint8_t> dat
     if (!result) return std::unexpected(result.error());
 
     result = table.parse_schema();
+    if (!result) return std::unexpected(result.error());
+
+    result = table.parse_data();
     if (!result) return std::unexpected(result.error());
 
     return table;
@@ -91,6 +96,7 @@ std::expected<void, std::string> UtfTable::parse_header() {
     uint32_t schema_offset = HEADER_SIZE;
     uint32_t schema_size = m_rows_offset - schema_offset;
     uint32_t strings_size = m_data_offset - m_strings_offset;
+    uint32_t data_size = m_source.size() - m_data_offset;
 
     if (strings_size == 0 || m_name_offset >= strings_size) {
         return std::unexpected("UTF parse failed: invalid string table");
@@ -105,6 +111,8 @@ std::expected<void, std::string> UtfTable::parse_header() {
         reinterpret_cast<const char*>(m_source.data() + m_strings_offset),
         strings_size
     );
+
+    m_data.assign(m_source.begin() + m_data_offset, m_source.begin() + m_data_offset + data_size);
 
     m_table_name = string_at(m_name_offset);
     m_columns.reserve(m_serialized_column_count);
@@ -173,6 +181,22 @@ std::expected<void, std::string> UtfTable::parse_schema() {
 
     m_default_values.assign(m_columns.size(), std::monostate{});
 
+    return {};
+}
+
+std::expected<void, std::string> UtfTable::parse_data() {
+    m_values.clear();
+    m_values.resize(m_num_rows);
+    for (uint32_t i = 0; i < m_num_rows; i++) {
+        std::vector<Value> &row = m_values[i];
+        row.resize(m_columns.size(), std::monostate{});
+        for (size_t j = 0; j < m_columns.size(); j++) {
+            auto result = get_value(i, j);
+            if (!result) 
+                return std::unexpected(result.error());
+            row[j] = std::move(*result);
+        }
+    }
     return {};
 }
 

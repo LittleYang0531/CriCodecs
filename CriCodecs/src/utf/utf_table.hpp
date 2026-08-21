@@ -70,15 +70,6 @@ constexpr uint32_t get_type_size(ColumnType type) {
     }
 }
 
-struct DataRef {
-    uint32_t offset = 0;
-    uint32_t size = 0;
-
-    bool operator==(const DataRef& other) const {
-        return offset == other.offset && size == other.size;
-    }
-};
-
 struct GUID {
     uint8_t data[16] = {};
     
@@ -96,7 +87,6 @@ using Value = std::variant<
     float, double,
     std::string,
     std::vector<uint8_t>,
-    DataRef,
     GUID
 >;
 
@@ -233,6 +223,7 @@ private:
 
     std::vector<uint8_t> m_schema_buf;
     std::string m_string_table;
+    std::vector<uint8_t> m_data;
     io::SourceView m_source;
     
     std::vector<Column> m_columns;
@@ -246,6 +237,7 @@ private:
     
     std::expected<void, std::string> parse_header();
     std::expected<void, std::string> parse_schema();
+    std::expected<void, std::string> parse_data();
     
     std::expected<std::span<const uint8_t>, std::string> field_data(uint32_t row, uint32_t col) const;
 

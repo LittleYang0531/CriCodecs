@@ -696,9 +696,11 @@ void print_value_json(std::ostream& out, const utf::Value& value) {
                 out << static_cast<unsigned int>(current[index]);
             }
             out << ']';
-        } else if constexpr (std::same_as<T, utf::DataRef>) {
-            out << "{\"offset\":" << current.offset << ",\"size\":" << current.size << '}';
-        } else if constexpr (std::same_as<T, utf::GUID>) {
+        } 
+        // else if constexpr (std::same_as<T, utf::DataRef>) {
+        //     out << "{\"offset\":" << current.offset << ",\"size\":" << current.size << '}';
+        // } 
+        else if constexpr (std::same_as<T, utf::GUID>) {
             std::ostringstream stream;
             for (uint8_t byte : current.data) {
                 stream << std::hex << std::setw(2) << std::setfill('0') << static_cast<unsigned int>(byte);
@@ -753,9 +755,11 @@ void print_utf_text(std::ostream& out, const utf::UtfTable& table) {
                     rendered << current;
                 } else if constexpr (std::same_as<T, std::vector<uint8_t>>) {
                     rendered << "<bytes:" << current.size() << '>';
-                } else if constexpr (std::same_as<T, utf::DataRef>) {
-                    rendered << "{offset=" << current.offset << ", size=" << current.size << '}';
-                } else if constexpr (std::same_as<T, utf::GUID>) {
+                } 
+                // else if constexpr (std::same_as<T, utf::DataRef>) {
+                //     rendered << "{offset=" << current.offset << ", size=" << current.size << '}';
+                // } 
+                else if constexpr (std::same_as<T, utf::GUID>) {
                     rendered << hex_text(current.data[0]);
                 } else if constexpr (std::same_as<T, bool>) {
                     rendered << bool_text(current);

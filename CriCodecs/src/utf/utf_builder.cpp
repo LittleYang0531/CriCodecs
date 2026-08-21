@@ -41,9 +41,7 @@ namespace {
         case ColumnType::Float: return std::holds_alternative<float>(value);
         case ColumnType::Double: return std::holds_alternative<double>(value);
         case ColumnType::String: return std::holds_alternative<std::string>(value);
-        case ColumnType::VLData:
-            return std::holds_alternative<std::vector<uint8_t>>(value) ||
-                std::holds_alternative<DataRef>(value);
+        case ColumnType::VLData: return std::holds_alternative<std::vector<uint8_t>>(value);
         case ColumnType::GUID: return std::holds_alternative<GUID>(value);
     }
     return false;
@@ -233,9 +231,10 @@ std::vector<uint8_t> UtfTable::build() const {
                         } else if constexpr (std::same_as<T, GUID>) {
                             auto& val_r = std::get<GUID>(m_values[r][c]);
                             all_same = (val0 == val_r);
-                        } else if constexpr (std::same_as<T, DataRef>) {
-                            auto& val_r = std::get<DataRef>(m_values[r][c]);
-                            all_same = (val0.offset == val_r.offset && val0.size == val_r.size);
+                        // } else if constexpr (std::same_as<T, DataRef>) {
+                        //     auto& val_r = std::get<DataRef>(m_values[r][c]);
+                        //     // all_same = (val0.offset == val_r.offset && val0.size == val_r.size);
+                        //     all_same = (val0 == val_r);
                         } else {
                             all_same = (val0 == std::get<T>(m_values[r][c]));
                         }
@@ -445,9 +444,6 @@ std::vector<uint8_t> UtfTable::build() const {
                 write_be<uint32_t>(dst + 4, static_cast<uint32_t>(v.size()));
             } else if constexpr (std::same_as<T, GUID>) {
                 std::memcpy(dst, v.data, 16);
-            } else if constexpr (std::same_as<T, DataRef>) {
-                write_be<uint32_t>(dst, v.offset);
-                write_be<uint32_t>(dst + 4, v.size);
             }
         }, val);
     };

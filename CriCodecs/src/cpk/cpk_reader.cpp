@@ -80,7 +80,6 @@ std::optional<T> value_to_unsigned(const utf::Value& value) {
         if constexpr (std::same_as<U, std::monostate> ||
                       std::same_as<U, std::string> ||
                       std::same_as<U, std::vector<uint8_t>> ||
-                      std::same_as<U, utf::DataRef> ||
                       std::same_as<U, utf::GUID>) {
             return std::nullopt;
         } else if constexpr (std::floating_point<U>) {

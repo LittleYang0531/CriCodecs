@@ -403,4 +403,37 @@ std::expected<void, std::string> AcbContainer::extract(
     return {};
 }
 
+std::expected<void, std::string> AcbContainer::set_awb(awb::AwbContainer &awb) {
+    auto data = awb.save();
+    if (!data)
+        return std::unexpected<std::string>(data.error());
+    m_header.set(0, "AwbFile", *data);
+    return {};
+}
+
+std::expected<std::vector<uint8_t>, std::string> AcbContainer::save() {
+    // printf("%d\n", m_header.get_data(0, 0));
+    m_header.get_data(0, 0);
+    auto header = m_header.build();
+    return header;
+}
+
+std::expected<void, std::string> AcbContainer::save_to_file(const std::filesystem::path& output_path) {
+    auto bytes = save();
+    if (!bytes) {
+        return std::unexpected(bytes.error());
+    }
+    io::writer writer;
+    if (auto result = writer.open(output_path); !result) {
+        return std::unexpected("ACB save failed: " + std::string(result.error()));
+    }
+    if (auto result = writer.write(*bytes); !result) {
+        return std::unexpected("ACB save failed: " + std::string(result.error()));
+    }
+    if (auto result = writer.close(); !result) {
+        return std::unexpected("ACB save failed: " + std::string(result.error()));
+    }
+    return {};
+}
+
 } // namespace cricodecs::acb

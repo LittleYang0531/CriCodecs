@@ -189,6 +189,9 @@ public:
     [[nodiscard]] std::optional<std::reference_wrapper<const utf::UtfTable>> subtable(std::string_view name) const;
     [[nodiscard]] std::string_view name() const;
     [[nodiscard]] const std::filesystem::path& source_path() const noexcept { return m_source_path; }
+    [[nodiscard]] std::expected<void, std::string> set_awb(awb::AwbContainer &awb);
+    [[nodiscard]] std::expected<std::vector<uint8_t>, std::string> save();
+    [[nodiscard]] std::expected<void, std::string> save_to_file(const std::filesystem::path& output_path);
 
 private:
     static constexpr int unresolved_column = -2;
