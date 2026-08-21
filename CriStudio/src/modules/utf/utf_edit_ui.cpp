@@ -166,11 +166,13 @@ QString utf_value_text(const cricodecs::utf::Value& value) {
             return utf8_to_qstring(item);
         } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
             return QCoreApplication::translate("Utf.UtfEditUi", "%1 bytes").arg(static_cast<qulonglong>(item.size()));
-        } else if constexpr (std::is_same_v<T, DataRef>) {
-            return QCoreApplication::translate("Utf.UtfEditUi", "offset 0x%1, %2 bytes")
-                .arg(item.offset, 0, 16)
-                .arg(item.size);
-        } else if constexpr (std::is_same_v<T, GUID>) {
+        } 
+        // else if constexpr (std::is_same_v<T, DataRef>) {
+        //     return QCoreApplication::translate("Utf.UtfEditUi", "offset 0x%1, %2 bytes")
+        //         .arg(item.offset, 0, 16)
+        //         .arg(item.size);
+        // } 
+        else if constexpr (std::is_same_v<T, GUID>) {
             QString out;
             out.reserve(32);
             for (const auto byte : item.data) {

@@ -197,10 +197,10 @@ LoadedDocument summarize(const std::filesystem::path& path, const cricodecs::utf
                     field.detail = cell_text;
                     field.cells = {column.name, type, cell_text};
                 }
-                if (value && std::holds_alternative<cricodecs::utf::DataRef>(*value)) {
-                    const auto ref = std::get<cricodecs::utf::DataRef>(*value);
-                    field.offset = hex_u64(static_cast<uint64_t>(utf.data_offset()) + ref.offset);
-                }
+                // if (value && std::holds_alternative<cricodecs::utf::DataRef>(*value)) {
+                //     const auto ref = std::get<cricodecs::utf::DataRef>(*value);
+                //     field.offset = hex_u64(static_cast<uint64_t>(utf.data_offset()) + ref.offset);
+                // }
             }
 
             row_cells[col] = cell_text;

@@ -267,10 +267,10 @@ template <typename Int>
         case cricodecs::utf::ColumnType::String:
             return raw_cri_string_from_python(value, encoding);
         case cricodecs::utf::ColumnType::VLData: {
-            if (nb::isinstance<nb::bytes>(value)) {
+            // if (nb::isinstance<nb::bytes>(value)) {
                 return copy_python_bytes(nb::cast<nb::bytes>(value));
-            }
-            return nb::cast<cricodecs::utf::DataRef>(value);
+            // }
+            // return nb::cast<cricodecs::utf::DataRef>(value);
         }
         case cricodecs::utf::ColumnType::GUID: {
             if (nb::isinstance<nb::bytes>(value)) {
@@ -538,10 +538,10 @@ void bind_utf_module(nb::module_& module) {
         .value("VLDATA", cricodecs::utf::ColumnType::VLData)
         .value("GUID", cricodecs::utf::ColumnType::GUID);
 
-    nb::class_<cricodecs::utf::DataRef>(module, "DataRef")
-        .def(nb::init<>())
-        .def_rw("offset", &cricodecs::utf::DataRef::offset)
-        .def_rw("size", &cricodecs::utf::DataRef::size);
+    // nb::class_<cricodecs::utf::DataRef>(module, "DataRef")
+    //     .def(nb::init<>())
+    //     .def_rw("offset", &cricodecs::utf::DataRef::offset)
+    //     .def_rw("size", &cricodecs::utf::DataRef::size);
 
     nb::class_<cricodecs::utf::GUID>(module, "Guid")
         .def(nb::init<>())
@@ -913,7 +913,7 @@ void bind_utf_module(nb::module_& module) {
             }
         );
 
-    install_attr_repr(module, "DataRef", {"offset", "size"});
+    // install_attr_repr(module, "DataRef", {"offset", "size"});
     install_attr_repr(module, "Guid", {"bytes"});
     install_attr_repr(module, "Column", {"name", "type", "flag", "flag_bits", "has_default", "has_row", "offset", "default_offset", "row_offset"});
     install_attr_repr(module, "Utf", {"table_name", "text_encoding", "row_count", "column_count", "version", "table_size", "row_width", "data_alignment", "is_loaded", "columns"});

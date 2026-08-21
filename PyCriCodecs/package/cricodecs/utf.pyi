@@ -21,9 +21,9 @@ class ColumnType:
     VLDATA: ClassVar["ColumnType"]
     GUID: ClassVar["ColumnType"]
 
-class DataRef:
-    offset: int
-    size: int
+# class DataRef:
+#     offset: int
+#     size: int
 
 class Guid:
     bytes: bytes

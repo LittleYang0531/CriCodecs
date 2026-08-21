@@ -126,11 +126,13 @@ std::string value_text(const cricodecs::utf::UtfTable& utf, uint32_t row, uint32
             return item.empty() ? "\"\"" : item;
         } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
             return byte_count(item.size());
-        } else if constexpr (std::is_same_v<T, cricodecs::utf::DataRef>) {
-            auto data = utf.get_data(row, col);
-            const auto suffix = data ? ", " + data_probe_text(*data) : std::string{};
-            return byte_count(item.size) + " at " + hex_u64(item.offset) + suffix;
-        } else if constexpr (std::is_same_v<T, cricodecs::utf::GUID>) {
+        } 
+        // else if constexpr (std::is_same_v<T, cricodecs::utf::DataRef>) {
+        //     auto data = utf.get_data(row, col);
+        //     const auto suffix = data ? ", " + data_probe_text(*data) : std::string{};
+        //     return byte_count(item.size) + " at " + hex_u64(item.offset) + suffix;
+        // } 
+        else if constexpr (std::is_same_v<T, cricodecs::utf::GUID>) {
             return guid_text(item);
         } else if constexpr (std::is_floating_point_v<T>) {
             std::ostringstream out;
